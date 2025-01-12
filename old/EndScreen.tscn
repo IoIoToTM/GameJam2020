@@ -1,0 +1,119 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Animation/fade_in.tres" type="Animation" id=2]
+[ext_resource path="res://old/transitionMaterial.tres" type="Material" id=3]
+[ext_resource path="res://Animation/fade_out.tres" type="Animation" id=4]
+[ext_resource path="res://old/IntroScreen.gd" type="Script" id=5]
+[ext_resource path="res://old/caveStoryFont.tres" type="DynamicFont" id=6]
+
+[sub_resource type="CSharpScript" id=1]
+script/source = "using Godot;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+
+public class Test : Node
+{
+	// Declare member variables here. Examples:
+	// private int a = 2;
+	// private string b = \"text\";
+	public void takeScreenshot(TextureRect rect)
+	{
+	
+
+		System.Threading.Thread.Sleep(100);
+
+		Bitmap screenshot = screenShot();
+
+		Godot.Image testImage = new Godot.Image();
+
+		using (MemoryStream ms = new MemoryStream())
+		{
+			screenshot.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+			ms.Position = 0;
+			testImage.LoadPngFromBuffer(ms.ToArray());
+		}
+		TextureRect sprite = (TextureRect)GetNode(\"TextureRect\");
+		rect.SetSize(new Vector2(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height));
+		ImageTexture imageTexture = new ImageTexture();
+
+		imageTexture.CreateFromImage(testImage);
+		rect.SetTexture(imageTexture);
+
+
+	}
+
+	// Called when the node enters the scene tree for the first time.
+	public override void _Ready()
+	{
+		
+		
+		/*foreach (var form in Application.OpenForms)
+		{
+			form.WindowState=FormWindowState.Minimized;
+		}*/
+	}
+
+	public Bitmap screenShot()
+	{
+		Bitmap bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+		Graphics graphics = Graphics.FromImage(bitmap as System.Drawing.Image);
+
+		graphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+
+		return bitmap;
+	}
+	
+	
+
+//  // Called every frame. 'delta' is the elapsed time since the previous frame.
+//  public override void _Process(float delta)
+//  {
+//      
+//  }
+}
+"
+
+[node name="EndGame" type="Node"]
+script = ExtResource( 5 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+margin_left = 336.0
+margin_top = 208.0
+margin_right = 784.0
+margin_bottom = 400.0
+custom_fonts/normal_font = ExtResource( 6 )
+text = "To be continued....
+
+
+
+Thanks for playing"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = ExtResource( 3 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="ColorRect"]
+anims/fade_in = ExtResource( 2 )
+anims/fade_out = ExtResource( 4 )
+
+[node name="Node" type="Node" parent="."]
+script = SubResource( 1 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
+current = true
+
+[node name="TextureRect" type="TextureRect" parent="."]
+__meta__ = {
+"_edit_use_anchors_": false
+}
